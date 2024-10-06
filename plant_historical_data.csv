@@ -1,0 +1,6 @@
+plant_name,avg_temperature,avg_precipitation,avg_solar_radiation,avg_humidity,avg_wind_speed,avg_soil_moisture,clay_content,sand_content,silt_content,soil_ph,soil_organic_carbon,successful_plant
+Tomato,24.0,120.0,250.0,60.0,2.5,0.3,20.0,30.0,50.0,6.5,3.0,1
+Lettuce,20.0,200.0,220.0,70.0,1.5,0.35,15.0,35.0,50.0,6.0,4.0,1
+Carrot,18.0,150.0,200.0,50.0,1.0,0.25,10.0,40.0,50.0,6.8,2.0,1
+Cucumber,26.0,100.0,260.0,65.0,3.0,0.28,12.0,38.0,50.0,6.3,3.5,1
+Pepper,22.0,80.0,240.0,55.0,2.0,0.3,15.0,25.0,60.0,6.7,3.2,0
