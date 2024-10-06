@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plant Recommendations</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+         :root {
+            --primary: #32ad5d;
+            --primary-hover: #e9cca3;
+            --background: #1a3e11;
+            --card-bg: rgba(15, 73, 18, 0.8);
+            --card-bg-hover: #e9cca3;
+            --text: #ffffff;
+            --text-muted: #99a8c9;
+            --border: #c0ceea;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--background);
+            color: var(--text);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            background-color: var(--primary);
+            color: var(--background);
+            text-align: center;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            border-radius: 0.5rem;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .location {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--background);
+            font-weight: bold;
+        }
+
+        .location svg {
+            margin-right: 0.5rem;
+        }
+
+        .search {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+
+        .search-container {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        #searchInput {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 2.5rem;
+            border: 1px solid var(--border);
+            border-radius: 9999px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            background-color: var(--card-bg);
+            color: var(--text);
+        }
+
+        #searchInput:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(50, 173, 93, 0.3);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        .plant-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .plant-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .plant-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background-color: var(--card-bg-hover);
+        }
+
+        .plant-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            transition: transform 0.3s;
+            cursor: pointer;
+        }
+
+        .plant-image:hover {
+            transform: scale(1.1);
+        }
+
+        .plant-content {
+            padding: 1rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .plant-content h3 {
+            margin: 0 0 0.5rem;
+            font-size: 1.25rem;
+            color: var(--primary);
+        }
+
+        .plant-content p {
+            margin: 0 0 1rem;
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            flex-grow: 1;
+        }
+
+        .plant-score {
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .learn-more {
+            display: block;
+            width: 100%;
+            padding: 0.5rem;
+            background-color: var(--primary);
+            color: var(--background);
+            text-align: center;
+            text-decoration: none;
+            border: none;
+            border-radius: 0.25rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .learn-more:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .no-results {
+            text-align: center;
+            color: var(--text-muted);
+            margin-top: 2rem;
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            position: relative;
+            max-width: 90%;
+            max-height: 90%;
+        }
+
+        .modal img {
+            width: 100%;
+            height: auto;
+            border-radius: 0.5rem;
+        }
+
+        .close {
+            position: absolute;
+            top: 10px;
+            right: 25px;
+            color: var(--text);
+            font-size: 35px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .plant-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1 >Recommended Plants for Your Land</h1>
+            <p class="location">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                    <circle cx="12" cy="10" r="3"></circle>
+                </svg>
+                <span id="location">Latitude: {{ latitude }}, Longitude: {{ longitude }}</span>
+            </p>
+        </header>
+        <div class="search">
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder="Search plants...">
+                <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+            </div>
+        </div>
+        <div id="plantGrid" class="plant-grid"></div>
+    </div>
+
+    <!-- Modal for image viewing -->
+    <div id="myModal" class="modal">
+        <span class="close" id="closeModal">&times;</span>
+        <div class="modal-content">
+            <img id="modalImage" src="" alt="Plant Image">
+        </div>
+    </div>
+
+    <script>
+        const plants = {{ recommendations|tojson|safe }};
+    
+        const plantGrid = document.getElementById("plantGrid");
+        const searchInput = document.getElementById("searchInput");
+        const myModal = document.getElementById("myModal");
+        const modalImage = document.getElementById("modalImage");
+        const closeModal = document.getElementById("closeModal");
+    
+        // Function to display plant cards
+        function displayPlants(plantsToShow) {
+            plantGrid.innerHTML = ""; // Clear previous content
+            if (plantsToShow.length === 0) {
+                plantGrid.innerHTML = '<p class="no-results">No plants found. Please try a different search.</p>';
+                return;
+            }
+    
+            plantsToShow.forEach(plant => {
+                const plantCard = document.createElement("div");
+                plantCard.classList.add("plant-card");
+                
+                const plantImage = document.createElement("img");
+                plantImage.src = plant.image || 'path/to/default/image.jpg';  // Use a default image if none provided
+                plantImage.alt = plant.name || 'Unknown Plant';
+                plantImage.classList.add("plant-image");
+    
+                // Add click event to open modal
+                plantImage.addEventListener("click", () => {
+                    modalImage.src = plant.image || 'path/to/default/image.jpg';
+                    myModal.style.display = "flex"; // Show modal
+                });
+    
+                const plantContent = document.createElement("div");
+                plantContent.classList.add("plant-content");
+                
+                const plantName = document.createElement("h3");
+                plantName.textContent = plant.name || 'Unknown Plant';
+                
+                const plantDescription = document.createElement("p");
+                plantDescription.textContent = plant.description || 'No description available';
+    
+                const plantScore = document.createElement("p");
+                plantScore.textContent = `Recommendation Score: ${(plant.score || 0).toFixed(2)}`;
+                plantScore.classList.add("plant-score");
+    
+                plantContent.appendChild(plantName);
+                plantContent.appendChild(plantDescription);
+                plantContent.appendChild(plantScore);
+                plantCard.appendChild(plantImage);
+                plantCard.appendChild(plantContent);
+                plantGrid.appendChild(plantCard);
+            });
+        }
+    
+        // Event listener for search input
+        searchInput.addEventListener("input", (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const filteredPlants = plants.filter(plant =>
+                (plant.name && plant.name.toLowerCase().includes(searchTerm)) ||
+                (plant.description && plant.description.toLowerCase().includes(searchTerm))
+            );
+            displayPlants(filteredPlants);
+        });
+    
+        // Display all plants on page load
+        displayPlants(plants);
+    
+        // Close modal functionality
+        closeModal.addEventListener("click", () => {
+            myModal.style.display = "none"; // Hide modal
+        });
+    
+        // Close modal when clicking outside of the modal content
+        window.addEventListener("click", (event) => {
+            if (event.target === myModal) {
+                myModal.style.display = "none"; // Hide modal
+            }
+        });
+    </script>
+</body>
+</html>

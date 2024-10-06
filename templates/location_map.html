@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Maps with Search and Manual Pin</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f9f9f9;
+            color: #4A4A4A;
+        }
+
+        h1 {
+            margin: 20px 0;
+            color: #4A9B3B;
+        }
+
+        #map {
+            height: 400px;
+            width: 100%;
+            max-width: 800px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        #search-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 10px;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        #search-input {
+            flex: 1;
+            padding: 10px;
+            font-size: 16px;
+            border: 2px solid #4A9B3B;
+            border-radius: 5px;
+            outline: none;
+            transition: border 0.3s;
+        }
+
+        #search-input:focus {
+            border-color: #3B7A2E;
+        }
+
+        #search-button {
+            padding: 10px 15px;
+            background-color: #4A9B3B;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 10px;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        #search-button:hover {
+            background-color: #3B7A2E;
+        }
+
+        #confirm-button {
+            padding: 10px 15px;
+            background-color: #FFA726;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        #confirm-button:hover {
+            background-color: #FF9800;
+        }
+
+        @media (max-width: 600px) {
+            #search-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            #search-button {
+                margin-left: 0;
+                margin-top: 10px;
+                width: 100%;
+            }
+
+            #confirm-button {
+                width: 100%;
+            }
+        }
+    </style>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCM8jdPlUmQofadccSBFnNg7-ts_qwOXaU&libraries=places"></script>
+    <script>
+        let map;
+        let marker;
+        let selectedLocation = { lat: null, lng: null };
+
+        function initMap() {
+            const defaultLocation = { lat: -34.397, lng: 150.644 };
+            map = new google.maps.Map(document.getElementById("map"), {
+                zoom: 8,
+                center: defaultLocation,
+            });
+
+            marker = new google.maps.Marker({
+                position: defaultLocation,
+                map: map,
+                draggable: true,
+            });
+
+            const input = document.getElementById("search-input");
+            const autocomplete = new google.maps.places.Autocomplete(input);
+
+            autocomplete.addListener("place_changed", () => {
+                const place = autocomplete.getPlace();
+                if (place.geometry) {
+                    map.setCenter(place.geometry.location);
+                    map.setZoom(15);
+                    marker.setPosition(place.geometry.location);
+                    selectedLocation.lat = place.geometry.location.lat();
+                    selectedLocation.lng = place.geometry.location.lng();
+                } else {
+                    alert("No details available for the selected place.");
+                }
+            });
+
+            map.addListener("click", (event) => {
+                const clickedLocation = event.latLng;
+                marker.setPosition(clickedLocation);
+                map.setCenter(clickedLocation);
+                selectedLocation.lat = clickedLocation.lat();
+                selectedLocation.lng = clickedLocation.lng();
+            });
+        }
+
+        function confirmLocation() {
+        if (selectedLocation.lat !== null && selectedLocation.lng !== null) {
+            document.getElementById('latitude').value = selectedLocation.lat;
+            document.getElementById('longitude').value = selectedLocation.lng;
+            document.getElementById('location-form').submit();
+        } else {
+            alert("Please select a location first.");
+        }
+    }
+    </script>
+</head>
+
+<body onload="initMap()">
+    <h1>Search for a Location or Pin Manually</h1>
+    <div id="search-container">
+        <input id="search-input" type="text" placeholder="Enter a location" />
+        <button id="search-button">Search</button>
+    </div>
+    <button id="confirm-button" onclick="confirmLocation()">Confirm Location</button>
+    <div id="map"></div>
+
+    
+    <form id="location-form" action="{{ url_for('location_select') }}" method="post" style="display: none;">
+        <input type="hidden" id="latitude" name="latitude">
+        <input type="hidden" id="longitude" name="longitude">
+    </form>
+</body>
+
+</html>
